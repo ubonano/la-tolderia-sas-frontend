@@ -1,4 +1,4 @@
-//Crear el repositorio de codigo en github
+//Crear el repositorio de codigo en
 // crear la gestion de categorias
 // crear la gestion de metodos de pago
 //Para que cargue de nuevlo los metodos de pago en los filtros hay que actualizar la pagina...  revisar
