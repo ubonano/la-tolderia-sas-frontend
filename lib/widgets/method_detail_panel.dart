@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/payment_categories_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../controllers/payment_methods_controller.dart';
 
-class CategoryDetailPanel extends StatefulWidget {
-  final DocumentSnapshot category;
-  const CategoryDetailPanel({Key? key, required this.category}) : super(key: key);
+class MethodDetailPanel extends StatefulWidget {
+  final DocumentSnapshot method;
+  const MethodDetailPanel({Key? key, required this.method}) : super(key: key);
 
   @override
-  _CategoryDetailPanelState createState() => _CategoryDetailPanelState();
+  _MethodDetailPanelState createState() => _MethodDetailPanelState();
 }
 
-class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
+class _MethodDetailPanelState extends State<MethodDetailPanel> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _detailController;
-  final PaymentCategoriesController controller = Get.find<PaymentCategoriesController>();
+  final PaymentMethodsController controller = Get.find<PaymentMethodsController>();
   bool editing = false;
-  String _currentCategory = '';
+  String _currentMethod = '';
   bool _isChanged = false;
 
   @override
   void initState() {
     super.initState();
-    _currentCategory = widget.category['name'];
-    _detailController = TextEditingController(text: _currentCategory);
+    _currentMethod = widget.method['name'];
+    _detailController = TextEditingController(text: _currentMethod);
     _isChanged = false;
   }
 
@@ -44,7 +44,7 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
         children: [
           Expanded(
             child: Text(
-              _currentCategory,
+              _currentMethod,
               style: const TextStyle(fontSize: 16),
             ),
           ),
@@ -54,7 +54,7 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
             onPressed: () {
               setState(() {
                 editing = true;
-                _detailController.text = _currentCategory;
+                _detailController.text = _currentMethod;
               });
             },
           ),
@@ -73,7 +73,7 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _isChanged = value.trim().toLowerCase() != _currentCategory.toLowerCase();
+                    _isChanged = value.trim().toLowerCase() != _currentMethod.toLowerCase();
                   });
                 },
                 validator: (value) {
@@ -81,12 +81,12 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
                     return 'Por favor ingrese el nombre';
                   }
                   String newValue = value.trim().toLowerCase();
-                  bool exists = controller.paymentCategories
+                  bool exists = controller.paymentMethods
                       .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString().toLowerCase())
-                      .where((name) => name != _currentCategory.toLowerCase())
+                      .where((name) => name != _currentMethod.toLowerCase())
                       .any((name) => name == newValue);
                   if (exists) {
-                    return 'La categoría ya existe';
+                    return 'El método ya existe';
                   }
                   return null;
                 },
@@ -100,29 +100,27 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
                       if (_formKey.currentState!.validate()) {
                         final newVal = _capitalize(_detailController.text.trim());
                         final firestore = FirebaseFirestore.instance;
-                        final snapshot = await firestore
-                            .collection('payment_categories')
-                            .where('name', isEqualTo: newVal)
-                            .get();
-                        bool duplicate = snapshot.docs.any((doc) => doc.id != widget.category.id);
+                        final snapshot =
+                            await firestore.collection('payment_methods').where('name', isEqualTo: newVal).get();
+                        bool duplicate = snapshot.docs.any((doc) => doc.id != widget.method.id);
                         if (duplicate) {
                           Get.snackbar(
                             'Error',
-                            'Ya se encuentra una categoría registrada con ese nombre',
+                            'Ya se encuentra un método registrado con ese nombre',
                             backgroundColor: Colors.red.shade100,
                           );
                         } else {
-                          await widget.category.reference.update({'name': newVal});
+                          await widget.method.reference.update({'name': newVal});
                         }
-                        await controller.loadPaymentCategories();
+                        await controller.loadPaymentMethods();
                         setState(() {
                           editing = false;
-                          _currentCategory = newVal;
+                          _currentMethod = newVal;
                           _isChanged = false;
                         });
                         Get.snackbar(
-                          'Categoría actualizada',
-                          'La categoría se actualizó a "$newVal"',
+                          'Método actualizado',
+                          'El método se actualizó a "$newVal"',
                           backgroundColor: Colors.green.shade100,
                         );
                       }
@@ -171,7 +169,7 @@ class _CategoryDetailPanelState extends State<CategoryDetailPanel> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Detalle categoría',
+                    'Detalle método',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   IconButton(

@@ -40,17 +40,16 @@ class RegisteredExpensesController extends GetxController {
   }
 
   Future<void> loadPaymentMethods() async {
-    List<String> methods = await PaymentMethodService.getPaymentMethods();
+    List<DocumentSnapshot> methods = await PaymentMethodService.getPaymentMethodsDocuments();
+    List<String> methodsNames = methods.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
     // Se agrega una opción vacía para representar "Todos"
-    paymentMethodOptions.value = [''] + methods;
+    paymentMethodOptions.value = [''] + methodsNames;
   }
 
   Future<void> loadPaymentCategories() async {
     List<DocumentSnapshot> docs = await PaymentCategoryService.getPaymentCategories();
     // Se obtiene el campo "name" de cada documento y se agrega una opción vacía para representar "Todos"
-    List<String> categories = docs
-        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
-        .toList();
+    List<String> categories = docs.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
     categoriaOptions.value = [''] + categories;
   }
 

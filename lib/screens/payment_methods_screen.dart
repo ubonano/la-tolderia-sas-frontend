@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/payment_categories_controller.dart';
+import '../controllers/payment_methods_controller.dart';
 import '../widgets/common/app_layout.dart';
-import '../widgets/new_category_panel.dart';
-import '../widgets/category_detail_panel.dart';
+import '../widgets/new_method_panel.dart';
+import '../widgets/method_detail_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
-  const PaymentCategoriesScreen({super.key});
+class PaymentMethodsScreen extends GetView<PaymentMethodsController> {
+  const PaymentMethodsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +16,21 @@ class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           const Text(
-            'Gestión de Categorías de Pago',
+            'Gestión de Métodos de Pago',
             style: TextStyle(fontSize: 18),
           ),
           IconButton(
             icon: const Icon(Icons.add, color: Colors.black),
-            tooltip: 'Crear nueva categoría',
+            tooltip: 'Crear nuevo método',
             onPressed: () {
               showGeneralDialog(
                 context: context,
-                barrierLabel: 'Nueva categoría',
+                barrierLabel: 'Nuevo método de pago',
                 barrierDismissible: true,
                 barrierColor: Colors.black.withOpacity(0.5),
                 transitionDuration: const Duration(milliseconds: 300),
                 pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-                  return const NewCategoryPanel();
+                  return const NewMethodPanel();
                 },
                 transitionBuilder: (context, animation, secondaryAnimation, child) {
                   var slideAnimation = Tween<Offset>(
@@ -47,9 +47,8 @@ class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
           ),
         ],
       ),
-      // Se utiliza la ruta '/payment-categories' para la pantalla actual
-      currentRoute: '/payment-categories',
-      backgroundColor: Colors.green.shade50,
+      currentRoute: '/payment-methods',
+      backgroundColor: Colors.blue.shade50,
       child: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.8,
@@ -73,18 +72,18 @@ class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Obx(() {
-                if (controller.paymentCategories.isEmpty) {
-                  return const Center(child: Text('No hay categorías de pago'));
+                if (controller.paymentMethods.isEmpty) {
+                  return const Center(child: Text('No hay métodos de pago'));
                 }
                 return ListView.builder(
-                  itemCount: controller.paymentCategories.length,
+                  itemCount: controller.paymentMethods.length,
                   itemBuilder: (context, index) {
-                    final DocumentSnapshot category = controller.paymentCategories[index];
-                    return PaymentCategoryTile(
-                      key: ValueKey(category.id),
-                      category: category,
+                    final DocumentSnapshot method = controller.paymentMethods[index];
+                    return PaymentMethodTile(
+                      key: ValueKey(method.id),
+                      method: method,
                       onDelete: () async {
-                        await controller.deleteCategory(category);
+                        await controller.deleteMethod(method);
                       },
                     );
                   },
@@ -98,30 +97,29 @@ class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
   }
 }
 
-// Nuevo widget para mostrar cada categoría con botón de eliminación visible al pasar el cursor
-class PaymentCategoryTile extends StatefulWidget {
-  final DocumentSnapshot category;
+class PaymentMethodTile extends StatefulWidget {
+  final DocumentSnapshot method;
   final VoidCallback onDelete;
 
-  const PaymentCategoryTile({
+  const PaymentMethodTile({
     Key? key,
-    required this.category,
+    required this.method,
     required this.onDelete,
   }) : super(key: key);
 
   @override
-  _PaymentCategoryTileState createState() => _PaymentCategoryTileState();
+  _PaymentMethodTileState createState() => _PaymentMethodTileState();
 }
 
-class _PaymentCategoryTileState extends State<PaymentCategoryTile> {
+class _PaymentMethodTileState extends State<PaymentMethodTile> {
   bool isHovered = false;
   bool confirming = false;
   FocusNode _focusNode = FocusNode();
 
   Widget _buildDefaultContent() {
     return ListTile(
-      key: const ValueKey('default'),
-      title: Text(widget.category['name']),
+      title: Text(widget.method['name']),
+
       trailing: isHovered
           ? Row(
               mainAxisSize: MainAxisSize.min,
@@ -130,15 +128,14 @@ class _PaymentCategoryTileState extends State<PaymentCategoryTile> {
                   icon: const Icon(Icons.info_outline, color: Colors.blue),
                   tooltip: 'Ver detalles',
                   onPressed: () {
-                    // Mostrar el panel lateral para ver y editar detalles de la categoría.
                     showGeneralDialog(
                       context: context,
-                      barrierLabel: 'Editar categoría',
+                      barrierLabel: 'Editar método',
                       barrierDismissible: true,
                       barrierColor: Colors.black.withOpacity(0.5),
                       transitionDuration: const Duration(milliseconds: 300),
                       pageBuilder: (context, animation, secondaryAnimation) {
-                        return CategoryDetailPanel(category: widget.category);
+                        return MethodDetailPanel(method: widget.method);
                       },
                       transitionBuilder: (context, animation, secondaryAnimation, child) {
                         var slideAnimation = Tween<Offset>(
@@ -155,7 +152,7 @@ class _PaymentCategoryTileState extends State<PaymentCategoryTile> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  tooltip: 'Eliminar categoría',
+                  tooltip: 'Eliminar método',
                   onPressed: () {
                     setState(() {
                       confirming = true;
@@ -171,7 +168,6 @@ class _PaymentCategoryTileState extends State<PaymentCategoryTile> {
 
   Widget _buildConfirmationContent() {
     return Container(
-      key: const ValueKey('confirm'),
       padding: const EdgeInsets.all(16.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -225,7 +221,7 @@ class _PaymentCategoryTileState extends State<PaymentCategoryTile> {
           height: 70.0,
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           decoration: BoxDecoration(
-            color: confirming ? Colors.red.shade100 : Colors.green.shade50,
+            color: confirming ? Colors.red.shade100 : Colors.blue.shade50,
             borderRadius: BorderRadius.circular(12.0),
             boxShadow: [
               BoxShadow(

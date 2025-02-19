@@ -12,6 +12,7 @@ import 'controllers/paid_expenses_controller.dart';
 import 'controllers/pending_expenses_controller.dart';
 import 'firebase_options.dart';
 import 'screens/paid_expenses_screen.dart';
+import 'screens/payment_methods_screen.dart';
 import 'screens/validation_expenses_screen.dart';
 import 'screens/registered_expenses_screen.dart';
 import 'screens/pending_expenses_screen.dart';
@@ -21,6 +22,7 @@ import 'controllers/pdf_viewer_controller.dart';
 import 'transitions/liquid_transition.dart';
 import 'controllers/payment_categories_controller.dart';
 import 'screens/payment_categories_screen.dart';
+import 'controllers/payment_methods_controller.dart';
 
 Future<void> ensurePaymentMethodsExist() async {
   final firestore = FirebaseFirestore.instance;
@@ -82,6 +84,7 @@ void main() async {
   Get.lazyPut<ExpenseDetailController>(() => ExpenseDetailController(), fenix: true);
   Get.lazyPut<PaidExpensesController>(() => PaidExpensesController(), fenix: true);
   Get.lazyPut<PaymentCategoriesController>(() => PaymentCategoriesController(), fenix: true);
+  Get.lazyPut<PaymentMethodsController>(() => PaymentMethodsController(), fenix: true);
 
   runApp(const MyApp());
 }
@@ -132,6 +135,12 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/payment-categories',
           page: () => const PaymentCategoriesScreen(),
+          customTransition: LiquidCustomTransition(),
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+        GetPage(
+          name: '/payment-methods',
+          page: () => const PaymentMethodsScreen(),
           customTransition: LiquidCustomTransition(),
           transitionDuration: const Duration(milliseconds: 300),
         ),

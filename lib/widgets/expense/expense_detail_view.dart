@@ -166,8 +166,8 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
                   ),
                   if (controller.paymentStatus.value == 'Pagado') ...[
                     const SizedBox(height: 16),
-                    FutureBuilder<List<String>>(
-                      future: PaymentMethodService.getPaymentMethods(),
+                    FutureBuilder<List<DocumentSnapshot>>(
+                      future: PaymentMethodService.getPaymentMethodsDocuments(),
                       builder: (context, snapshot) {
                         if (!snapshot.hasData) {
                           return const CircularProgressIndicator();
@@ -175,8 +175,10 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
                         final methods = snapshot.data!;
                         return EditableDropdown(
                           label: 'Método:',
-                          initialValue: controller.paymentMethod.value ?? (methods.isNotEmpty ? methods[0] : ''),
-                          options: methods,
+                          initialValue:
+                              controller.paymentMethod.value ?? (methods.isNotEmpty ? methods[0]['name'] : ''),
+                          options:
+                              methods.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList(),
                           onSave: (newValue) async {
                             await controller.updatePaymentMethod(newValue);
                           },
@@ -256,9 +258,7 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
           return const CircularProgressIndicator();
         }
         final docs = snapshot.data!;
-        List<String> categories = docs
-            .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
-            .toList();
+        List<String> categories = docs.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
         return EditableDropdown(
           label: 'Categoría:',
           initialValue: _getCategoryValue(expense),

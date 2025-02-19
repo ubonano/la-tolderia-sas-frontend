@@ -45,6 +45,8 @@ class AppLayout extends GetView<LayoutController> {
               selectedIndex = 3;
             } else if (currentRoute == '/payment-categories') {
               selectedIndex = 4;
+            } else if (currentRoute == '/payment-methods') {
+              selectedIndex = 5;
             } else {
               selectedIndex = 0;
             }
@@ -66,6 +68,8 @@ class AppLayout extends GetView<LayoutController> {
                     Get.toNamed('/registered-expenses');
                   } else if (index == 4 && currentRoute != '/payment-categories') {
                     Get.toNamed('/payment-categories');
+                  } else if (index == 5 && currentRoute != '/payment-methods') {
+                    Get.toNamed('/payment-methods');
                   }
                 },
                 backgroundColor: backgroundColor,
@@ -109,6 +113,14 @@ class AppLayout extends GetView<LayoutController> {
                       child: Icon(Icons.category),
                     ),
                     label: Text('Categorías de pago'),
+                  ),
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Gestión de métodos de pago',
+                      child: Icon(Icons.account_balance_wallet),
+                    ),
+                    label: Text('Métodos de pago'),
                   ),
                 ],
               ),
