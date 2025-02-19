@@ -1,4 +1,4 @@
-//Crear el repositorio de codigo en
+// Verificar que las categorias, metodos de pago, etc, no se repitan!
 // crear la gestion de categorias
 // crear la gestion de metodos de pago
 //Para que cargue de nuevlo los metodos de pago en los filtros hay que actualizar la pagina...  revisar

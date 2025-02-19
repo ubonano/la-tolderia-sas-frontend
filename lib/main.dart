@@ -19,6 +19,8 @@ import 'controllers/layout_controller.dart';
 import 'controllers/registered_expenses_controller.dart';
 import 'controllers/pdf_viewer_controller.dart';
 import 'transitions/liquid_transition.dart';
+import 'controllers/payment_categories_controller.dart';
+import 'screens/payment_categories_screen.dart';
 
 Future<void> ensurePaymentMethodsExist() async {
   final firestore = FirebaseFirestore.instance;
@@ -69,16 +71,17 @@ void main() async {
   // FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   // Ejecutar el script para insertar métodos de pago si no existen
-  await ensurePaymentMethodsExist();
-  await ensurePaymentCategoriesExist();
+  // await ensurePaymentMethodsExist();
+  // await ensurePaymentCategoriesExist();
 
-  // Inicializar los controladores
-  Get.put(LayoutController());
-  Get.put(RegisteredExpensesController());
-  Get.put(PdfViewerController());
-  Get.put(PendingExpensesController());
-  Get.put(ExpenseDetailController());
-  Get.put(PaidExpensesController());
+  // Initialize the controllers lazily
+  Get.lazyPut<LayoutController>(() => LayoutController(), fenix: true);
+  Get.lazyPut<RegisteredExpensesController>(() => RegisteredExpensesController(), fenix: true);
+  Get.lazyPut<PdfViewerController>(() => PdfViewerController(), fenix: true);
+  Get.lazyPut<PendingExpensesController>(() => PendingExpensesController(), fenix: true);
+  Get.lazyPut<ExpenseDetailController>(() => ExpenseDetailController(), fenix: true);
+  Get.lazyPut<PaidExpensesController>(() => PaidExpensesController(), fenix: true);
+  Get.lazyPut<PaymentCategoriesController>(() => PaymentCategoriesController(), fenix: true);
 
   runApp(const MyApp());
 }
@@ -123,6 +126,12 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/validation-expenses',
           page: () => const ValidationExpensesScreen(),
+          customTransition: LiquidCustomTransition(),
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+        GetPage(
+          name: '/payment-categories',
+          page: () => const PaymentCategoriesScreen(),
           customTransition: LiquidCustomTransition(),
           transitionDuration: const Duration(milliseconds: 300),
         ),

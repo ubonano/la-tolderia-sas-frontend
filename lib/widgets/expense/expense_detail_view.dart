@@ -249,13 +249,16 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
   }
 
   Widget _buildCategoryDropdown(DocumentSnapshot expense) {
-    return FutureBuilder<List<String>>(
+    return FutureBuilder<List<DocumentSnapshot>>(
       future: PaymentCategoryService.getPaymentCategories(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return const CircularProgressIndicator();
         }
-        final categories = snapshot.data!;
+        final docs = snapshot.data!;
+        List<String> categories = docs
+            .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+            .toList();
         return EditableDropdown(
           label: 'Categoría:',
           initialValue: _getCategoryValue(expense),

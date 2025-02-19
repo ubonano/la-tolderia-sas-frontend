@@ -31,8 +31,6 @@ class RegisteredExpensesScreen extends GetView<RegisteredExpensesController> {
 
   @override
   Widget build(BuildContext context) {
-    // final controller = Get.put(RegisteredExpensesController());
-
     return AppLayout(
       customTitle: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -43,8 +41,7 @@ class RegisteredExpensesScreen extends GetView<RegisteredExpensesController> {
                 items: List.generate(12, (index) => index + 1)
                     .map((monthNumber) => DropdownMenuItem<int>(
                           value: monthNumber,
-                          child: Text(controller.monthNames[monthNumber - 1],
-                              style: const TextStyle(fontSize: 18)),
+                          child: Text(controller.monthNames[monthNumber - 1], style: const TextStyle(fontSize: 18)),
                         ))
                     .toList(),
                 onChanged: controller.updateMonth,
@@ -55,8 +52,7 @@ class RegisteredExpensesScreen extends GetView<RegisteredExpensesController> {
                 items: controller.years
                     .map((year) => DropdownMenuItem<int>(
                           value: year,
-                          child:
-                              Text(year.toString(), style: const TextStyle(fontSize: 18)),
+                          child: Text(year.toString(), style: const TextStyle(fontSize: 18)),
                         ))
                     .toList(),
                 onChanged: controller.updateYear,
@@ -187,8 +183,7 @@ class RegisteredExpensesScreen extends GetView<RegisteredExpensesController> {
                                                 child: Padding(
                                                   padding: const EdgeInsets.all(8.0),
                                                   child: index == 0
-                                                      ? Text('No hay gastos registrados',
-                                                          textAlign: TextAlign.center)
+                                                      ? Text('No hay gastos registrados', textAlign: TextAlign.center)
                                                       : const SizedBox.shrink(),
                                                 ),
                                               )),
@@ -242,9 +237,8 @@ class RegisteredExpensesScreen extends GetView<RegisteredExpensesController> {
                                               child: Text(
                                                 data['paymentStatus'] ?? '',
                                                 style: TextStyle(
-                                                  color: data['paymentStatus'] == 'Pagado'
-                                                      ? Colors.green
-                                                      : Colors.orange,
+                                                  color:
+                                                      data['paymentStatus'] == 'Pagado' ? Colors.green : Colors.orange,
                                                 ),
                                               ),
                                             ),

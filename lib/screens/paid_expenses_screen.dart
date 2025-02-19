@@ -49,8 +49,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                     items: <String>["", "Emisor A", "Emisor B", "Emisor C"]
                         .map((issuer) => DropdownMenuItem<String>(
                               value: issuer,
-                              child: Text(issuer.isEmpty ? "Todos" : issuer,
-                                  style: const TextStyle(fontSize: 16)),
+                              child: Text(issuer.isEmpty ? "Todos" : issuer, style: const TextStyle(fontSize: 16)),
                             ))
                         .toList(),
                     onChanged: controller.updateIssuer,
@@ -75,8 +74,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                     items: controller.categoriaOptions
                         .map((option) => DropdownMenuItem<String>(
                               value: option,
-                              child: Text(option.isEmpty ? "Todos" : option,
-                                  style: const TextStyle(fontSize: 16)),
+                              child: Text(option.isEmpty ? "Todos" : option, style: const TextStyle(fontSize: 16)),
                             ))
                         .toList(),
                     onChanged: controller.updateCategoria,
@@ -95,8 +93,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                     items: controller.paymentMethodOptions
                         .map((option) => DropdownMenuItem<String>(
                               value: option,
-                              child: Text(option.isEmpty ? "Todos" : option,
-                                  style: const TextStyle(fontSize: 16)),
+                              child: Text(option.isEmpty ? "Todos" : option, style: const TextStyle(fontSize: 16)),
                             ))
                         .toList(),
                     onChanged: controller.updatePaymentMethod,
@@ -131,8 +128,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                 items: List.generate(12, (index) => index + 1)
                     .map((monthNumber) => DropdownMenuItem<int>(
                           value: monthNumber,
-                          child: Text(controller.monthNames[monthNumber - 1],
-                              style: const TextStyle(fontSize: 18)),
+                          child: Text(controller.monthNames[monthNumber - 1], style: const TextStyle(fontSize: 18)),
                         ))
                     .toList(),
                 onChanged: controller.updateMonth,
@@ -143,8 +139,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                 items: controller.years
                     .map((year) => DropdownMenuItem<int>(
                           value: year,
-                          child: Text(year.toString(),
-                              style: const TextStyle(fontSize: 18)),
+                          child: Text(year.toString(), style: const TextStyle(fontSize: 18)),
                         ))
                     .toList(),
                 onChanged: controller.updateYear,
@@ -212,13 +207,35 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                                       color: Colors.grey.shade100,
                                     ),
                                     children: const [
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Emisor', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Número', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Fecha', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Importe', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Categoría', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Método de pago', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                      TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Emisor', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Número', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Fecha', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Importe', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Categoría', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Método de pago',
+                                                  style: TextStyle(fontWeight: FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold)))),
                                     ],
                                   ),
                                   if (docs.isEmpty)
@@ -316,4 +333,4 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
       ),
     );
   }
-} 
+}

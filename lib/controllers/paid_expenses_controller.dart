@@ -47,7 +47,10 @@ class PaidExpensesController extends GetxController {
   }
 
   Future<void> loadPaymentCategories() async {
-    List<String> categories = await PaymentCategoryService.getPaymentCategories();
+    List<DocumentSnapshot> docs = await PaymentCategoryService.getPaymentCategories();
+    List<String> categories = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
     // Se agrega una opción vacía para representar "Todos"
     categoriaOptions.value = [''] + categories;
   }

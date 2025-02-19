@@ -34,7 +34,10 @@ class PendingExpensesController extends GetxController {
   }
 
   Future<void> loadPaymentCategories() async {
-    List<String> categories = await PaymentCategoryService.getPaymentCategories();
+    List<DocumentSnapshot> docs = await PaymentCategoryService.getPaymentCategories();
+    List<String> categories = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
     categoriaOptions.value = [''] + categories;
   }
 

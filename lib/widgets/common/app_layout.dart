@@ -26,9 +26,9 @@ class AppLayout extends GetView<LayoutController> {
         backgroundColor: backgroundColor,
         title: customTitle ?? Text(title ?? "", style: Theme.of(context).textTheme.titleLarge),
         leading: Obx(() => IconButton(
-          icon: Icon(controller.isDrawerCollapsed ? Icons.menu : Icons.menu_open),
-          onPressed: controller.toggleDrawer,
-        )),
+              icon: Icon(controller.isDrawerCollapsed ? Icons.menu : Icons.menu_open),
+              onPressed: controller.toggleDrawer,
+            )),
       ),
       body: Row(
         children: [
@@ -43,6 +43,8 @@ class AppLayout extends GetView<LayoutController> {
               selectedIndex = 2;
             } else if (currentRoute == '/registered-expenses') {
               selectedIndex = 3;
+            } else if (currentRoute == '/payment-categories') {
+              selectedIndex = 4;
             } else {
               selectedIndex = 0;
             }
@@ -62,10 +64,28 @@ class AppLayout extends GetView<LayoutController> {
                     Get.toNamed('/validation-expenses');
                   } else if (index == 3 && currentRoute != '/registered-expenses') {
                     Get.toNamed('/registered-expenses');
+                  } else if (index == 4 && currentRoute != '/payment-categories') {
+                    Get.toNamed('/payment-categories');
                   }
                 },
                 backgroundColor: backgroundColor,
                 destinations: const [
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Validación de gastos',
+                      child: Icon(Icons.search),
+                    ),
+                    label: Text('Validación de gastos'),
+                  ),
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Gastos registrados',
+                      child: Icon(Icons.assignment),
+                    ),
+                    label: Text('Gastos registrados'),
+                  ),
                   NavigationRailDestination(
                     padding: EdgeInsets.zero,
                     icon: Tooltip(
@@ -85,18 +105,10 @@ class AppLayout extends GetView<LayoutController> {
                   NavigationRailDestination(
                     padding: EdgeInsets.zero,
                     icon: Tooltip(
-                      message: 'Validación de gastos',
-                      child: Icon(Icons.search),
+                      message: 'Gestión de categorías de pago',
+                      child: Icon(Icons.category),
                     ),
-                    label: Text('Validación de gastos'),
-                  ),
-                  NavigationRailDestination(
-                    padding: EdgeInsets.zero,
-                    icon: Tooltip(
-                      message: 'Gastos registrados',
-                      child: Icon(Icons.assignment),
-                    ),
-                    label: Text('Gastos registrados'),
+                    label: Text('Categorías de pago'),
                   ),
                 ],
               ),
