@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/payment_methods_controller.dart';
+import '../../controllers/beneficiaries_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class NewMethodPanel extends StatefulWidget {
-  const NewMethodPanel({Key? key}) : super(key: key);
+class NewBeneficiaryPanel extends StatefulWidget {
+  const NewBeneficiaryPanel({Key? key}) : super(key: key);
 
   @override
-  _NewMethodPanelState createState() => _NewMethodPanelState();
+  _NewBeneficiaryPanelState createState() => _NewBeneficiaryPanelState();
 }
 
-class _NewMethodPanelState extends State<NewMethodPanel> {
+class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _methodController = TextEditingController();
+  final TextEditingController _beneficiaryController = TextEditingController();
 
-  final PaymentMethodsController controller = Get.find<PaymentMethodsController>();
+  final BeneficiariesController controller = Get.find<BeneficiariesController>();
 
   @override
   void dispose() {
-    _methodController.dispose();
+    _beneficiaryController.dispose();
     super.dispose();
   }
 
@@ -30,7 +30,7 @@ class _NewMethodPanelState extends State<NewMethodPanel> {
   @override
   Widget build(BuildContext context) {
     return Material(
-      // Material con transparencia para poder tener sombra y fondo blanco
+      // Material with transparency to have shadow and white background
       type: MaterialType.transparency,
       child: Align(
         alignment: Alignment.centerRight,
@@ -55,7 +55,7 @@ class _NewMethodPanelState extends State<NewMethodPanel> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Crear nuevo método',
+                    'Crear nuevo beneficiario',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   IconButton(
@@ -71,20 +71,20 @@ class _NewMethodPanelState extends State<NewMethodPanel> {
               Form(
                 key: _formKey,
                 child: TextFormField(
-                  controller: _methodController,
+                  controller: _beneficiaryController,
                   decoration: const InputDecoration(
-                    labelText: 'Nombre del método',
+                    labelText: 'Nombre del beneficiario',
                     border: OutlineInputBorder(),
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Por favor ingrese el nombre del método';
+                      return 'Por favor ingrese el nombre del beneficiario';
                     }
                     String newValue = value.trim().toLowerCase();
-                    if (controller.paymentMethods
+                    if (controller.beneficiaries
                         .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString().toLowerCase())
                         .any((name) => name == newValue)) {
-                      return 'El método ya existe';
+                      return 'El beneficiario ya existe';
                     }
                     return null;
                   },
@@ -94,41 +94,39 @@ class _NewMethodPanelState extends State<NewMethodPanel> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    final newMethod = _capitalize(_methodController.text.trim());
-                    
-                    // Consultar en Firestore si el método ya existe
+                    final newBeneficiary = _capitalize(_beneficiaryController.text.trim());
+
+                    // Consultar en Firestore si el beneficiario ya existe
                     final querySnapshot = await FirebaseFirestore.instance
-                        .collection('payment_methods')
-                        .where('name', isEqualTo: newMethod)
+                        .collection('beneficiaries')
+                        .where('name', isEqualTo: newBeneficiary)
                         .limit(1)
                         .get();
-                    
+
                     if (querySnapshot.docs.isNotEmpty) {
-                      // El método ya existe en la base de datos, se muestra un error
+                      // El beneficiario ya existe en la base de datos, se muestra un error
                       Get.snackbar(
                         'Error',
-                        'El método "$newMethod" ya existe en la base de datos',
+                        'El beneficiario "$newBeneficiary" ya existe en la base de datos',
                         backgroundColor: Colors.red.shade100,
                         snackPosition: SnackPosition.BOTTOM,
                       );
                       return;
                     }
-                    
-                    // Almacenar el nuevo método en Firestore
-                    await FirebaseFirestore.instance
-                        .collection('payment_methods')
-                        .add({'name': newMethod});
+
+                    // Almacenar el nuevo beneficiario en Firestore
+                    await FirebaseFirestore.instance.collection('beneficiaries').add({'name': newBeneficiary});
                     // Actualizar el listado observable
-                    await controller.loadPaymentMethods();
+                    await controller.loadBeneficiaries();
                     Get.back(); // Cierra el diálogo
                     Get.snackbar(
-                      'Método creado',
-                      'El método "$newMethod" fue creado',
+                      'Beneficiario creado',
+                      'El beneficiario "$newBeneficiary" fue creado',
                       backgroundColor: Colors.green.shade100,
                     );
                   }
                 },
-                child: const Text('Guardar método'),
+                child: const Text('Guardar beneficiario'),
               ),
             ],
           ),

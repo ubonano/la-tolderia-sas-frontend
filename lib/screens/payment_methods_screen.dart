@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/payment_methods_controller.dart';
 import '../widgets/common/app_layout.dart';
-import '../widgets/new_method_panel.dart';
-import '../widgets/method_detail_panel.dart';
+import '../widgets/panels/new_method_panel.dart';
+import '../widgets/panels/method_detail_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PaymentMethodsScreen extends GetView<PaymentMethodsController> {

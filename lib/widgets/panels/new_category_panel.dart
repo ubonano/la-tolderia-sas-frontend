@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/payment_categories_controller.dart';
+import '../../controllers/payment_categories_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewCategoryPanel extends StatefulWidget {

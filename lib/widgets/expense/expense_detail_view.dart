@@ -4,12 +4,12 @@ import 'package:get/get.dart';
 
 import '../../controllers/expense_detail_controller.dart';
 import '../common/custom_dialog.dart';
+import '../fields/payment_date_field.dart';
 import 'file_viewer.dart';
-import '../date_field.dart';
-import '../editable_dropdown.dart';
-import '../editable_field.dart';
-import '../due_date_field.dart';
-import '../payment_date_field.dart';
+import '../fields/date_field.dart';
+import '../fields/editable_dropdown.dart';
+import '../fields/editable_field.dart';
+import '../fields/due_date_field.dart';
 import '../../services/payment_method_service.dart';
 import '../../services/payment_category_service.dart';
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/beneficiaries_controller.dart';
 import '../widgets/common/app_layout.dart';
-import '../widgets/new_beneficiary_panel.dart';
-import '../widgets/beneficiary_detail_panel.dart';
+import '../widgets/panels/new_beneficiary_panel.dart';
+import '../widgets/panels/beneficiary_detail_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BeneficiariesScreen extends GetView<BeneficiariesController> {
@@ -48,7 +48,7 @@ class BeneficiariesScreen extends GetView<BeneficiariesController> {
         ],
       ),
       currentRoute: '/beneficiaries',
-      backgroundColor: Colors.blue.shade50,
+      backgroundColor: Colors.red[100]!,
       child: Center(
         child: Container(
           width: MediaQuery.of(context).size.width * 0.8,
@@ -220,7 +220,7 @@ class _BeneficiaryTileState extends State<BeneficiaryTile> {
           height: 70.0,
           margin: const EdgeInsets.symmetric(vertical: 8.0),
           decoration: BoxDecoration(
-            color: confirming ? Colors.red.shade100 : Colors.blue.shade50,
+            color: confirming ? Colors.red.shade100 : Colors.red[100],
             borderRadius: BorderRadius.circular(12.0),
             boxShadow: [
               BoxShadow(
@@ -250,4 +250,4 @@ class _BeneficiaryTileState extends State<BeneficiaryTile> {
     _focusNode.dispose();
     super.dispose();
   }
-} 
+}

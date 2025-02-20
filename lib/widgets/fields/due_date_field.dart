@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
-import '../controllers/pdf_viewer_controller.dart';
+import '../../controllers/pdf_viewer_controller.dart';
 
 class DueDateField extends StatefulWidget {
   final DocumentSnapshot expense;

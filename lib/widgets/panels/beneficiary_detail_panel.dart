@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../controllers/beneficiaries_controller.dart';
+import '../../controllers/beneficiaries_controller.dart';
 
 class BeneficiaryDetailPanel extends StatefulWidget {
   final DocumentSnapshot beneficiary;

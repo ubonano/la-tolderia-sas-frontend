@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/payment_categories_controller.dart';
 import '../widgets/common/app_layout.dart';
-import '../widgets/new_category_panel.dart';
-import '../widgets/category_detail_panel.dart';
+import '../widgets/panels/new_category_panel.dart';
+import '../widgets/panels/category_detail_panel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PaymentCategoriesScreen extends GetView<PaymentCategoriesController> {
