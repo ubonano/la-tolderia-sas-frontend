@@ -12,24 +12,43 @@ class BeneficiaryDetailPanel extends StatefulWidget {
 }
 
 class _BeneficiaryDetailPanelState extends State<BeneficiaryDetailPanel> {
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
   late TextEditingController _detailController;
+  late TextEditingController _cbuController;
+  late TextEditingController _phoneController;
+  late TextEditingController _emailController;
   final BeneficiariesController controller = Get.find<BeneficiariesController>();
-  bool editing = false;
+
+  bool editingName = false;
+  bool editingCBU = false;
+  bool editingPhone = false;
+  bool editingEmail = false;
+
   String _currentName = '';
-  bool _isChanged = false;
+  String _currentCBU = '';
+  String _currentPhone = '';
+  String _currentEmail = '';
 
   @override
   void initState() {
     super.initState();
-    _currentName = widget.beneficiary['name'];
+    final data = widget.beneficiary.data() as Map<String, dynamic>;
+    _currentName = data['name'];
+    _currentCBU = data['cbu'] ?? '';
+    _currentPhone = data['phone'] ?? '';
+    _currentEmail = data['email'] ?? '';
     _detailController = TextEditingController(text: _currentName);
-    _isChanged = false;
+    _cbuController = TextEditingController(text: _currentCBU);
+    _phoneController = TextEditingController(text: _currentPhone);
+    _emailController = TextEditingController(text: _currentEmail);
   }
 
   @override
   void dispose() {
     _detailController.dispose();
+    _cbuController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -37,109 +56,289 @@ class _BeneficiaryDetailPanelState extends State<BeneficiaryDetailPanel> {
     if (s.isEmpty) return s;
     return s[0].toUpperCase() + s.substring(1).toLowerCase();
   }
+  
+  Future<void> _saveField(String field) async {
+    String newName = _detailController.text.trim();
+    String newCBU = _cbuController.text.trim();
+    String newPhone = _phoneController.text.trim();
+    String newEmail = _emailController.text.trim();
 
-  Widget _buildEditableField() {
-    if (!editing) {
+    if (field == 'name') {
+      if (newName.isEmpty) {
+        Get.snackbar('Error', 'Por favor ingrese el nombre', backgroundColor: Colors.red.shade100);
+        return;
+      }
+      newName = _capitalize(newName);
+      final firestore = FirebaseFirestore.instance;
+      final snapshot = await firestore.collection('beneficiaries').where('name', isEqualTo: newName).get();
+      bool duplicate = snapshot.docs.any((doc) => doc.id != widget.beneficiary.id);
+      if (duplicate) {
+        Get.snackbar('Error', 'El beneficiario ya existe', backgroundColor: Colors.red.shade100);
+        return;
+      }
+    } else if (field == 'cbu') {
+      if (newCBU.isEmpty) {
+        Get.snackbar('Error', 'Por favor ingrese el CBU', backgroundColor: Colors.red.shade100);
+        return;
+      }
+    } else if (field == 'phone') {
+      if (newPhone.isEmpty) {
+        Get.snackbar('Error', 'Por favor ingrese el teléfono', backgroundColor: Colors.red.shade100);
+        return;
+      }
+    } else if (field == 'email') {
+      if (newEmail.isEmpty) {
+        Get.snackbar('Error', 'Por favor ingrese el correo electrónico', backgroundColor: Colors.red.shade100);
+        return;
+      }
+      if (!RegExp(r'\S+@\S+\.\S+').hasMatch(newEmail)) {
+        Get.snackbar('Error', 'Ingrese un correo electrónico válido', backgroundColor: Colors.red.shade100);
+        return;
+      }
+    }
+
+    await widget.beneficiary.reference.update({
+      'name': newName.isEmpty ? _currentName : newName,
+      'cbu': newCBU.isEmpty ? _currentCBU : newCBU,
+      'phone': newPhone.isEmpty ? _currentPhone : newPhone,
+      'email': newEmail.isEmpty ? _currentEmail : newEmail,
+    });
+
+    await controller.loadBeneficiaries();
+
+    setState(() {
+      if (field == 'name') {
+        _currentName = newName;
+        editingName = false;
+      } else if (field == 'cbu') {
+        _currentCBU = newCBU;
+        editingCBU = false;
+      } else if (field == 'phone') {
+        _currentPhone = newPhone;
+        editingPhone = false;
+      } else if (field == 'email') {
+        _currentEmail = newEmail;
+        editingEmail = false;
+      }
+    });
+
+    Get.snackbar('Beneficiario actualizado', 'El $field se actualizó correctamente',
+        backgroundColor: Colors.green.shade100);
+  }
+
+  Widget _buildNameRow() {
+    if (!editingName) {
       return Row(
         children: [
           Expanded(
-            child: Text(
-              _currentName,
-              style: const TextStyle(fontSize: 16),
-            ),
+            child: Text('Nombre: $_currentName', style: const TextStyle(fontSize: 16)),
           ),
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.blue),
-            tooltip: 'Editar',
+            tooltip: 'Editar Nombre',
             onPressed: () {
               setState(() {
-                editing = true;
-                _detailController.text = _currentName;
+                editingName = true;
               });
             },
           ),
         ],
       );
     } else {
-      return Form(
-        key: _formKey,
-        child: Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: _detailController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _isChanged = value.trim().toLowerCase() != _currentName.toLowerCase();
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return 'Por favor ingrese el nombre';
-                  }
-                  String newValue = value.trim().toLowerCase();
-                  bool exists = controller.beneficiaries
-                      .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString().toLowerCase())
-                      .where((name) => name != _currentName.toLowerCase())
-                      .any((name) => name == newValue);
-                  if (exists) {
-                    return 'El beneficiario ya existe';
-                  }
-                  return null;
-                },
+      return Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _detailController,
+              decoration: const InputDecoration(
+                labelText: 'Nombre',
+                border: OutlineInputBorder(),
               ),
             ),
-            IconButton(
-              icon: const Icon(Icons.check, color: Colors.green),
-              tooltip: 'Guardar',
-              onPressed: _isChanged
-                  ? () async {
-                      if (_formKey.currentState!.validate()) {
-                        final newVal = _capitalize(_detailController.text.trim());
-                        final firestore = FirebaseFirestore.instance;
-                        final snapshot =
-                            await firestore.collection('beneficiaries').where('name', isEqualTo: newVal).get();
-                        bool duplicate = snapshot.docs.any((doc) => doc.id != widget.beneficiary.id);
-                        if (duplicate) {
-                          Get.snackbar(
-                            'Error',
-                            'Ya se encuentra un beneficiario registrado con ese nombre',
-                            backgroundColor: Colors.red.shade100,
-                          );
-                        } else {
-                          await widget.beneficiary.reference.update({'name': newVal});
-                        }
-                        await controller.loadBeneficiaries();
-                        setState(() {
-                          editing = false;
-                          _currentName = newVal;
-                          _isChanged = false;
-                        });
-                        Get.snackbar(
-                          'Beneficiario actualizado',
-                          'El beneficiario se actualizó a "$newVal"',
-                          backgroundColor: Colors.green.shade100,
-                        );
-                      }
-                    }
-                  : null,
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.red),
-              tooltip: 'Cancelar',
-              onPressed: () {
-                setState(() {
-                  editing = false;
-                });
-              },
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            tooltip: 'Guardar Nombre',
+            onPressed: () => _saveField('name'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.red),
+            tooltip: 'Cancelar',
+            onPressed: () {
+              setState(() {
+                editingName = false;
+                _detailController.text = _currentName;
+              });
+            },
+          ),
+        ],
       );
     }
+  }
+
+  Widget _buildCBURow() {
+    if (!editingCBU) {
+      return Row(
+        children: [
+          Expanded(
+            child: Text('CBU: $_currentCBU', style: const TextStyle(fontSize: 16)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            tooltip: 'Editar CBU',
+            onPressed: () {
+              setState(() {
+                editingCBU = true;
+              });
+            },
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _cbuController,
+              decoration: const InputDecoration(
+                labelText: 'CBU',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            tooltip: 'Guardar CBU',
+            onPressed: () => _saveField('cbu'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.red),
+            tooltip: 'Cancelar',
+            onPressed: () {
+              setState(() {
+                editingCBU = false;
+                _cbuController.text = _currentCBU;
+              });
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget _buildPhoneRow() {
+    if (!editingPhone) {
+      return Row(
+        children: [
+          Expanded(
+            child: Text('Teléfono: $_currentPhone', style: const TextStyle(fontSize: 16)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            tooltip: 'Editar Teléfono',
+            onPressed: () {
+              setState(() {
+                editingPhone = true;
+              });
+            },
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _phoneController,
+              decoration: const InputDecoration(
+                labelText: 'Teléfono',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            tooltip: 'Guardar Teléfono',
+            onPressed: () => _saveField('phone'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.red),
+            tooltip: 'Cancelar',
+            onPressed: () {
+              setState(() {
+                editingPhone = false;
+                _phoneController.text = _currentPhone;
+              });
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget _buildEmailRow() {
+    if (!editingEmail) {
+      return Row(
+        children: [
+          Expanded(
+            child: Text('Email: $_currentEmail', style: const TextStyle(fontSize: 16)),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Colors.blue),
+            tooltip: 'Editar Email',
+            onPressed: () {
+              setState(() {
+                editingEmail = true;
+              });
+            },
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Correo Electrónico',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.check, color: Colors.green),
+            tooltip: 'Guardar Email',
+            onPressed: () => _saveField('email'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.red),
+            tooltip: 'Cancelar',
+            onPressed: () {
+              setState(() {
+                editingEmail = false;
+                _emailController.text = _currentEmail;
+              });
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  Widget _buildDetailFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildNameRow(),
+        const SizedBox(height: 12),
+        _buildCBURow(),
+        const SizedBox(height: 12),
+        _buildPhoneRow(),
+        const SizedBox(height: 12),
+        _buildEmailRow(),
+      ],
+    );
   }
 
   @override
@@ -182,7 +381,7 @@ class _BeneficiaryDetailPanelState extends State<BeneficiaryDetailPanel> {
                 ],
               ),
               const SizedBox(height: 20),
-              _buildEditableField(),
+              _buildDetailFields(),
               const Spacer(),
             ],
           ),

@@ -12,13 +12,23 @@ class BeneficiaryService {
     await beneficiary.reference.delete();
   }
 
-  // Agrega un nuevo beneficiario
-  static Future<void> addBeneficiary(String name) async {
-    await FirebaseFirestore.instance.collection('beneficiaries').add({'name': name});
+  // Agrega un nuevo beneficiario con campos adicionales: CBU, Telefono, Email
+  static Future<void> addBeneficiary(String name, String cbu, String phone, String email) async {
+    await FirebaseFirestore.instance.collection('beneficiaries').add({
+      'name': name,
+      'cbu': cbu,
+      'phone': phone,
+      'email': email,
+    });
   }
 
-  // Actualiza el nombre de un beneficiario
-  static Future<void> updateBeneficiary(DocumentSnapshot beneficiary, String newName) async {
-    await beneficiary.reference.update({'name': newName});
+  // Actualiza los datos de un beneficiario
+  static Future<void> updateBeneficiary(DocumentSnapshot beneficiary, String newName, String newCBU, String newPhone, String newEmail) async {
+    await beneficiary.reference.update({
+      'name': newName,
+      'cbu': newCBU,
+      'phone': newPhone,
+      'email': newEmail,
+    });
   }
 } 

@@ -1,4 +1,7 @@
-//Gestion de expense_issuere
+// Darle aspecto a el detalle de beneficiarios... 
+//Agregar para copiar cada dato por separado
+//Agregar categoria de beneficiario.
+//Agregar cuit.
 //Para que cargue de nuevlo los metodos de pago en los filtros hay que actualizar la pagina...  revisar
 
 // Validar que no exista el gasto antes de registrarlo (numero y emisor)

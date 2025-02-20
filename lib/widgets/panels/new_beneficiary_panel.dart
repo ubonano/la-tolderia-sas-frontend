@@ -13,12 +13,18 @@ class NewBeneficiaryPanel extends StatefulWidget {
 class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _beneficiaryController = TextEditingController();
+  final TextEditingController _cbuController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
 
   final BeneficiariesController controller = Get.find<BeneficiariesController>();
 
   @override
   void dispose() {
     _beneficiaryController.dispose();
+    _cbuController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -70,24 +76,73 @@ class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
               const SizedBox(height: 20),
               Form(
                 key: _formKey,
-                child: TextFormField(
-                  controller: _beneficiaryController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre del beneficiario',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor ingrese el nombre del beneficiario';
-                    }
-                    String newValue = value.trim().toLowerCase();
-                    if (controller.beneficiaries
-                        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString().toLowerCase())
-                        .any((name) => name == newValue)) {
-                      return 'El beneficiario ya existe';
-                    }
-                    return null;
-                  },
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _beneficiaryController,
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre del beneficiario',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor ingrese el nombre del beneficiario';
+                        }
+                        String newValue = value.trim().toLowerCase();
+                        if (controller.beneficiaries
+                            .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString().toLowerCase())
+                            .any((name) => name == newValue)) {
+                          return 'El beneficiario ya existe';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _cbuController,
+                      decoration: const InputDecoration(
+                        labelText: 'CBU',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor ingrese el CBU';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _phoneController,
+                      decoration: const InputDecoration(
+                        labelText: 'Teléfono',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor ingrese el teléfono del beneficiario';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Correo Electrónico',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Por favor ingrese el correo electrónico';
+                        }
+                        if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                          return 'Ingrese un correo electrónico válido';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
               ),
               const Spacer(),
@@ -95,6 +150,9 @@ class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final newBeneficiary = _capitalize(_beneficiaryController.text.trim());
+                    final newCBU = _cbuController.text.trim();
+                    final newPhone = _phoneController.text.trim();
+                    final newEmail = _emailController.text.trim();
 
                     // Consultar en Firestore si el beneficiario ya existe
                     final querySnapshot = await FirebaseFirestore.instance
@@ -104,7 +162,6 @@ class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
                         .get();
 
                     if (querySnapshot.docs.isNotEmpty) {
-                      // El beneficiario ya existe en la base de datos, se muestra un error
                       Get.snackbar(
                         'Error',
                         'El beneficiario "$newBeneficiary" ya existe en la base de datos',
@@ -114,9 +171,13 @@ class _NewBeneficiaryPanelState extends State<NewBeneficiaryPanel> {
                       return;
                     }
 
-                    // Almacenar el nuevo beneficiario en Firestore
-                    await FirebaseFirestore.instance.collection('beneficiaries').add({'name': newBeneficiary});
-                    // Actualizar el listado observable
+                    // Almacenar el nuevo beneficiario en Firestore con campos adicionales
+                    await FirebaseFirestore.instance.collection('beneficiaries').add({
+                      'name': newBeneficiary,
+                      'cbu': newCBU,
+                      'phone': newPhone,
+                      'email': newEmail,
+                    });
                     await controller.loadBeneficiaries();
                     Get.back(); // Cierra el diálogo
                     Get.snackbar(
