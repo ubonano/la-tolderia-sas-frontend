@@ -3,14 +3,15 @@ description: Incluye automáticamente archivos base y comunes del proyecto
 globs: 
 ---
 
-[main.dart](mdc:lib/main.dart)
+@lib/main.dart
+
+[payment_date_field.dart](mdc:lib/widgets/payment_date_field.dart)
+[editable_field.dart](mdc:lib/widgets/editable_field.dart)
+[editable_dropdown.dart](mdc:lib/widgets/editable_dropdown.dart)
+[due_date_field.dart](mdc:lib/widgets/due_date_field.dart)
+[date_field.dart](mdc:lib/widgets/date_field.dart)
 
 [app_layout.dart](mdc:lib/widgets/common/app_layout.dart)
 [custom_dialog.dart](mdc:lib/widgets/common/custom_dialog.dart)
-
-[date_field.dart](mdc:lib/widgets/date_field.dart)
-[due_date_field.dart](mdc:lib/widgets/due_date_field.dart)
-[editable_dropdown.dart](mdc:lib/widgets/editable_dropdown.dart)
-[editable_field.dart](mdc:lib/widgets/editable_field.dart)
 
 [liquid_transition.dart](mdc:lib/transitions/liquid_transition.dart)

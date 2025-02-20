@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/payment_method_service.dart';
 import '../services/payment_category_service.dart';
+import '../services/beneficiary_service.dart';
 
 class RegisteredExpensesController extends GetxController {
   // Estado observable para los filtros
@@ -10,7 +11,7 @@ class RegisteredExpensesController extends GetxController {
   final RxString selectedPaymentMethod = "".obs;
   final RxString selectedEstado = "".obs;
   final RxString selectedCategoria = "".obs;
-  final RxString filterIssuer = "".obs;
+  final RxString selectedBeneficiary = "".obs;
 
   // Lista de opciones para los filtros
   final List<int> years = [2021, 2022, 2023, 2024, 2025];
@@ -31,25 +32,40 @@ class RegisteredExpensesController extends GetxController {
   final RxList<String> paymentMethodOptions = <String>[].obs;
   final List<String> estadoOptions = ["", "Pendiente", "Pagado"];
   final RxList<String> categoriaOptions = <String>[].obs;
+  final RxList<String> beneficiaryOptions = <String>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     loadPaymentMethods();
     loadPaymentCategories();
+    loadBeneficiaries();
+  }
+
+  Future<void> loadBeneficiaries() async {
+    List<DocumentSnapshot> docs =
+        await BeneficiaryService.getBeneficiariesDocuments();
+    List<String> beneficiaries = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
+    beneficiaryOptions.value = [''] + beneficiaries;
   }
 
   Future<void> loadPaymentMethods() async {
-    List<DocumentSnapshot> methods = await PaymentMethodService.getPaymentMethodsDocuments();
-    List<String> methodsNames = methods.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
-    // Se agrega una opción vacía para representar "Todos"
+    List<DocumentSnapshot> methods =
+        await PaymentMethodService.getPaymentMethodsDocuments();
+    List<String> methodsNames = methods
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
     paymentMethodOptions.value = [''] + methodsNames;
   }
 
   Future<void> loadPaymentCategories() async {
-    List<DocumentSnapshot> docs = await PaymentCategoryService.getPaymentCategories();
-    // Se obtiene el campo "name" de cada documento y se agrega una opción vacía para representar "Todos"
-    List<String> categories = docs.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
+    List<DocumentSnapshot> docs =
+        await PaymentCategoryService.getPaymentCategories();
+    List<String> categories = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
     categoriaOptions.value = [''] + categories;
   }
 
@@ -59,13 +75,18 @@ class RegisteredExpensesController extends GetxController {
 
     // Filtrar por año y mes
     final startDate = DateTime(selectedYear.value, selectedMonth.value, 1);
-    final endDate = DateTime(selectedYear.value, selectedMonth.value + 1, 0, 23, 59, 59);
+    final endDate =
+        DateTime(selectedYear.value, selectedMonth.value + 1, 0, 23, 59, 59);
 
     query = query
         .where('date', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
         .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate));
 
-    // Aplicar filtros adicionales si están seleccionados
+    // Actualización: usar selectedBeneficiary y campo 'beneficiary'
+    if (selectedBeneficiary.isNotEmpty) {
+      query =
+          query.where('beneficiary', isEqualTo: selectedBeneficiary.value);
+    }
     if (selectedPaymentMethod.isNotEmpty) {
       query = query.where('paymentMethod', isEqualTo: selectedPaymentMethod.value);
     }
@@ -74,9 +95,6 @@ class RegisteredExpensesController extends GetxController {
     }
     if (selectedCategoria.isNotEmpty) {
       query = query.where('category', isEqualTo: selectedCategoria.value);
-    }
-    if (filterIssuer.isNotEmpty) {
-      query = query.where('issuer', isEqualTo: filterIssuer.value);
     }
 
     return query.snapshots();
@@ -103,8 +121,8 @@ class RegisteredExpensesController extends GetxController {
     if (categoria != null) selectedCategoria.value = categoria;
   }
 
-  void updateIssuer(String? issuer) {
-    if (issuer != null) filterIssuer.value = issuer;
+  void updateBeneficiary(String? beneficiary) {
+    if (beneficiary != null) selectedBeneficiary.value = beneficiary;
   }
 
   // Método para limpiar todos los filtros
@@ -112,6 +130,6 @@ class RegisteredExpensesController extends GetxController {
     selectedPaymentMethod.value = "";
     selectedEstado.value = "";
     selectedCategoria.value = "";
-    filterIssuer.value = "";
+    selectedBeneficiary.value = "";
   }
 }

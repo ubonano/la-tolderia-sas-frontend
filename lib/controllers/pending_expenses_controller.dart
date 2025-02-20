@@ -1,12 +1,13 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/payment_category_service.dart';
+import '../services/beneficiary_service.dart';
 
 class PendingExpensesController extends GetxController {
   // Filtros observables
   final RxInt selectedYear = DateTime.now().year.obs;
   final RxInt selectedMonth = DateTime.now().month.obs;
-  final RxString filterIssuer = "".obs;
+  final RxString selectedBeneficiary = "".obs;
   final RxString selectedCategoria = "".obs;
 
   // Opciones para los filtros
@@ -26,11 +27,13 @@ class PendingExpensesController extends GetxController {
     "Diciembre"
   ];
   final RxList<String> categoriaOptions = <String>[].obs;
+  final RxList<String> beneficiaryOptions = <String>[].obs;
 
   @override
   void onInit() {
     super.onInit();
     loadPaymentCategories();
+    loadBeneficiaries();
   }
 
   Future<void> loadPaymentCategories() async {
@@ -39,6 +42,14 @@ class PendingExpensesController extends GetxController {
         .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
         .toList();
     categoriaOptions.value = [''] + categories;
+  }
+
+  Future<void> loadBeneficiaries() async {
+    List<DocumentSnapshot> docs = await BeneficiaryService.getBeneficiariesDocuments();
+    List<String> beneficiaries = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
+    beneficiaryOptions.value = [''] + beneficiaries;
   }
 
   // Consulta para obtener los gastos pendientes ordenados por fecha de vencimiento
@@ -55,8 +66,8 @@ class PendingExpensesController extends GetxController {
         .where('paymentStatus', isEqualTo: 'Pendiente');
 
     // Aplicar filtros adicionales si están seleccionados
-    if (filterIssuer.isNotEmpty) {
-      query = query.where('issuer', isEqualTo: filterIssuer.value);
+    if (selectedBeneficiary.isNotEmpty) {
+      query = query.where('beneficiary', isEqualTo: selectedBeneficiary.value);
     }
     if (selectedCategoria.isNotEmpty) {
       query = query.where('category', isEqualTo: selectedCategoria.value);
@@ -77,8 +88,8 @@ class PendingExpensesController extends GetxController {
     if (month != null) selectedMonth.value = month;
   }
 
-  void updateIssuer(String? issuer) {
-    if (issuer != null) filterIssuer.value = issuer;
+  void updateBeneficiary(String? beneficiary) {
+    if (beneficiary != null) selectedBeneficiary.value = beneficiary;
   }
 
   void updateCategoria(String? categoria) {
@@ -87,7 +98,7 @@ class PendingExpensesController extends GetxController {
 
   // Método para limpiar los filtros
   void clearFilters() {
-    filterIssuer.value = "";
+    selectedBeneficiary.value = "";
     selectedCategoria.value = "";
   }
 }

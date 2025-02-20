@@ -2,12 +2,13 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/payment_method_service.dart';
 import '../services/payment_category_service.dart';
+import '../services/beneficiary_service.dart';
 
 class PaidExpensesController extends GetxController {
   // Observables para los filtros
   final RxInt selectedYear = DateTime.now().year.obs;
   final RxInt selectedMonth = DateTime.now().month.obs;
-  final RxString filterIssuer = "".obs;
+  final RxString selectedBeneficiary = "".obs;
   final RxString selectedCategoria = "".obs;
   final RxString selectedPaymentMethod = "".obs;
 
@@ -15,6 +16,8 @@ class PaidExpensesController extends GetxController {
   final RxList<String> paymentMethodOptions = <String>[].obs;
   // Se reemplaza la lista estática de categorías por una lista observable
   final RxList<String> categoriaOptions = <String>[].obs;
+  // Nueva lista para beneficiarios
+  final RxList<String> beneficiaryOptions = <String>[].obs;
 
   // Opciones para los filtros
   final List<int> years = [2021, 2022, 2023, 2024, 2025];
@@ -38,19 +41,33 @@ class PaidExpensesController extends GetxController {
     super.onInit();
     loadPaymentMethods();
     loadPaymentCategories(); // Carga dinámica de categorías
+    loadBeneficiaries(); // Agregamos la carga de beneficiarios
+  }
+
+  Future<void> loadBeneficiaries() async {
+    List<DocumentSnapshot> docs =
+        await BeneficiaryService.getBeneficiariesDocuments();
+    List<String> beneficiaries = docs
+        .map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
+    beneficiaryOptions.value = [''] + beneficiaries;
   }
 
   Future<void> loadPaymentMethods() async {
-    List<DocumentSnapshot> methods = await PaymentMethodService.getPaymentMethodsDocuments();
-    List<String> methodsNames = methods.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
-    // Se agrega una opción vacía para representar "Todos"
+    List<DocumentSnapshot> methods =
+        await PaymentMethodService.getPaymentMethodsDocuments();
+    List<String> methodsNames = methods
+        .map((doc) =>
+            (doc.data() as Map<String, dynamic>)['name'].toString())
+        .toList();
     paymentMethodOptions.value = [''] + methodsNames;
   }
 
   Future<void> loadPaymentCategories() async {
-    List<DocumentSnapshot> docs = await PaymentCategoryService.getPaymentCategories();
-    List<String> categories = docs.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
-    // Se agrega una opción vacía para representar "Todos"
+    List<DocumentSnapshot> docs =
+        await PaymentCategoryService.getPaymentCategories();
+    List<String> categories =
+        docs.map((doc) => (doc.data() as Map<String, dynamic>)['name'].toString()).toList();
     categoriaOptions.value = [''] + categories;
   }
 
@@ -65,8 +82,8 @@ class PaidExpensesController extends GetxController {
         .where('date', isLessThanOrEqualTo: Timestamp.fromDate(endDate))
         .where('paymentStatus', isEqualTo: 'Pagado');
 
-    if (filterIssuer.isNotEmpty) {
-      query = query.where('issuer', isEqualTo: filterIssuer.value);
+    if (selectedBeneficiary.isNotEmpty) {
+      query = query.where('beneficiary', isEqualTo: selectedBeneficiary.value);
     }
     if (selectedCategoria.isNotEmpty) {
       query = query.where('category', isEqualTo: selectedCategoria.value);
@@ -88,8 +105,8 @@ class PaidExpensesController extends GetxController {
     if (month != null) selectedMonth.value = month;
   }
 
-  void updateIssuer(String? issuer) {
-    if (issuer != null) filterIssuer.value = issuer;
+  void updateBeneficiary(String? beneficiary) {
+    if (beneficiary != null) selectedBeneficiary.value = beneficiary;
   }
 
   void updateCategoria(String? categoria) {
@@ -102,7 +119,7 @@ class PaidExpensesController extends GetxController {
 
   // Método para limpiar los filtros
   void clearFilters() {
-    filterIssuer.value = "";
+    selectedBeneficiary.value = "";
     selectedCategoria.value = "";
     selectedPaymentMethod.value = "";
   }

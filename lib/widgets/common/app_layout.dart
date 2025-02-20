@@ -43,10 +43,12 @@ class AppLayout extends GetView<LayoutController> {
               selectedIndex = 2;
             } else if (currentRoute == '/registered-expenses') {
               selectedIndex = 3;
-            } else if (currentRoute == '/payment-categories') {
+            } else if (currentRoute == '/beneficiaries') {
               selectedIndex = 4;
-            } else if (currentRoute == '/payment-methods') {
+            } else if (currentRoute == '/payment-categories') {
               selectedIndex = 5;
+            } else if (currentRoute == '/payment-methods') {
+              selectedIndex = 6;
             } else {
               selectedIndex = 0;
             }
@@ -66,30 +68,16 @@ class AppLayout extends GetView<LayoutController> {
                     Get.toNamed('/validation-expenses');
                   } else if (index == 3 && currentRoute != '/registered-expenses') {
                     Get.toNamed('/registered-expenses');
-                  } else if (index == 4 && currentRoute != '/payment-categories') {
+                  } else if (index == 4 && currentRoute != '/beneficiaries') {
+                    Get.toNamed('/beneficiaries');
+                  } else if (index == 5 && currentRoute != '/payment-categories') {
                     Get.toNamed('/payment-categories');
-                  } else if (index == 5 && currentRoute != '/payment-methods') {
+                  } else if (index == 6 && currentRoute != '/payment-methods') {
                     Get.toNamed('/payment-methods');
                   }
                 },
                 backgroundColor: backgroundColor,
                 destinations: const [
-                  NavigationRailDestination(
-                    padding: EdgeInsets.zero,
-                    icon: Tooltip(
-                      message: 'Validación de gastos',
-                      child: Icon(Icons.search),
-                    ),
-                    label: Text('Validación de gastos'),
-                  ),
-                  NavigationRailDestination(
-                    padding: EdgeInsets.zero,
-                    icon: Tooltip(
-                      message: 'Gastos registrados',
-                      child: Icon(Icons.assignment),
-                    ),
-                    label: Text('Gastos registrados'),
-                  ),
                   NavigationRailDestination(
                     padding: EdgeInsets.zero,
                     icon: Tooltip(
@@ -109,7 +97,31 @@ class AppLayout extends GetView<LayoutController> {
                   NavigationRailDestination(
                     padding: EdgeInsets.zero,
                     icon: Tooltip(
-                      message: 'Gestión de categorías de pago',
+                      message: 'Validación de gastos',
+                      child: Icon(Icons.search),
+                    ),
+                    label: Text('Validación de gastos'),
+                  ),
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Gastos registrados',
+                      child: Icon(Icons.assignment),
+                    ),
+                    label: Text('Gastos registrados'),
+                  ),
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Beneficiarios',
+                      child: Icon(Icons.people),
+                    ),
+                    label: Text('Beneficiarios'),
+                  ),
+                  NavigationRailDestination(
+                    padding: EdgeInsets.zero,
+                    icon: Tooltip(
+                      message: 'Categorías de pago',
                       child: Icon(Icons.category),
                     ),
                     label: Text('Categorías de pago'),
@@ -117,7 +129,7 @@ class AppLayout extends GetView<LayoutController> {
                   NavigationRailDestination(
                     padding: EdgeInsets.zero,
                     icon: Tooltip(
-                      message: 'Gestión de métodos de pago',
+                      message: 'Métodos de pago',
                       child: Icon(Icons.account_balance_wallet),
                     ),
                     label: Text('Métodos de pago'),

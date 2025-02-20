@@ -1,6 +1,4 @@
-// Verificar que las categorias, metodos de pago, etc, no se repitan!
-// crear la gestion de categorias
-// crear la gestion de metodos de pago
+//Gestion de expense_issuere
 //Para que cargue de nuevlo los metodos de pago en los filtros hay que actualizar la pagina...  revisar
 
 // Validar que no exista el gasto antes de registrarlo (numero y emisor)

@@ -23,6 +23,8 @@ import 'transitions/liquid_transition.dart';
 import 'controllers/payment_categories_controller.dart';
 import 'screens/payment_categories_screen.dart';
 import 'controllers/payment_methods_controller.dart';
+import 'controllers/beneficiaries_controller.dart';
+import 'screens/beneficiaries_screen.dart';
 
 Future<void> ensurePaymentMethodsExist() async {
   final firestore = FirebaseFirestore.instance;
@@ -68,13 +70,13 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8382);
-  FirebaseFunctions.instance.useFunctionsEmulator('localhost', 8381);
+  FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8482);
+  FirebaseFunctions.instance.useFunctionsEmulator('localhost', 8481);
   // FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
 
   // Ejecutar el script para insertar métodos de pago si no existen
-  // await ensurePaymentMethodsExist();
-  // await ensurePaymentCategoriesExist();
+  await ensurePaymentMethodsExist();
+  await ensurePaymentCategoriesExist();
 
   // Initialize the controllers lazily
   Get.lazyPut<LayoutController>(() => LayoutController(), fenix: true);
@@ -85,6 +87,7 @@ void main() async {
   Get.lazyPut<PaidExpensesController>(() => PaidExpensesController(), fenix: true);
   Get.lazyPut<PaymentCategoriesController>(() => PaymentCategoriesController(), fenix: true);
   Get.lazyPut<PaymentMethodsController>(() => PaymentMethodsController(), fenix: true);
+  Get.lazyPut<BeneficiariesController>(() => BeneficiariesController(), fenix: true);
 
   runApp(const MyApp());
 }
@@ -141,6 +144,12 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/payment-methods',
           page: () => const PaymentMethodsScreen(),
+          customTransition: LiquidCustomTransition(),
+          transitionDuration: const Duration(milliseconds: 300),
+        ),
+        GetPage(
+          name: '/beneficiaries',
+          page: () => const BeneficiariesScreen(),
           customTransition: LiquidCustomTransition(),
           transitionDuration: const Duration(milliseconds: 300),
         ),

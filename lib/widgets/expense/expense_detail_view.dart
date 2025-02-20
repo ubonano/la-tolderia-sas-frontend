@@ -210,9 +210,12 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
     );
   }
 
-  Future<bool> _checkIssuerExists(String issuer) async {
-    final querySnapshot =
-        await FirebaseFirestore.instance.collection('issuers').where('name', isEqualTo: issuer).limit(1).get();
+  Future<bool> _checkBeneficiaryExists(String beneficiary) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('beneficiaries')
+        .where('name', isEqualTo: beneficiary)
+        .limit(1)
+        .get();
     return querySnapshot.docs.isNotEmpty;
   }
 
@@ -229,12 +232,12 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
         const SizedBox(height: 16),
         EditableField(
           expense: expense,
-          fieldName: 'issuer',
-          label: 'Emisor:',
+          fieldName: 'beneficiary',
+          label: 'Beneficiario:',
           onUpdate: (updatedDoc) {},
           collectionName: controller.collectionName,
-          validationFuture: _checkIssuerExists(expense['issuer']),
-          validationErrorMessage: 'El emisor no está registrado',
+          validationFuture: _checkBeneficiaryExists(expense['beneficiary']),
+          validationErrorMessage: 'El beneficiario no está registrado',
         ),
         const SizedBox(height: 16),
         EditableField(
@@ -290,10 +293,10 @@ class ExpenseDetailView extends GetView<ExpenseDetailController> {
     DateTime due = data.containsKey('dueDate') ? (data['dueDate'] as Timestamp).toDate() : DateTime.now();
     bool disableByDate = due.isBefore(expenseDate);
     return FutureBuilder<bool>(
-      future: _checkIssuerExists(data['issuer']),
+      future: _checkBeneficiaryExists(data['beneficiary']),
       builder: (context, snapshot) {
-        bool issuerExists = snapshot.data ?? false;
-        bool disableRegister = disableByDate || !issuerExists;
+        bool beneficiaryExists = snapshot.data ?? false;
+        bool disableRegister = disableByDate || !beneficiaryExists;
         return Column(
           children: [
             const SizedBox(height: 16),

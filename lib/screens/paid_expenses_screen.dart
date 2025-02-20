@@ -37,22 +37,22 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         children: [
-          // Filtro por Emisor
+          // Filtro por Beneficiario
           Expanded(
             flex: 3,
             child: Container(
               padding: const EdgeInsets.only(right: 8.0),
               child: Obx(() => DropdownButton<String>(
                     isExpanded: true,
-                    value: controller.filterIssuer.value,
+                    value: controller.selectedBeneficiary.value,
                     hint: const Text("Todos", style: TextStyle(fontSize: 16)),
-                    items: <String>["", "Emisor A", "Emisor B", "Emisor C"]
-                        .map((issuer) => DropdownMenuItem<String>(
-                              value: issuer,
-                              child: Text(issuer.isEmpty ? "Todos" : issuer, style: const TextStyle(fontSize: 16)),
+                    items: controller.beneficiaryOptions
+                        .map((beneficiary) => DropdownMenuItem<String>(
+                              value: beneficiary,
+                              child: Text(beneficiary.isEmpty ? "Todos" : beneficiary, style: const TextStyle(fontSize: 16)),
                             ))
                         .toList(),
-                    onChanged: controller.updateIssuer,
+                    onChanged: controller.updateBeneficiary,
                   )),
             ),
           ),
@@ -189,7 +189,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                               const SizedBox(height: 16),
                               Table(
                                 columnWidths: const {
-                                  0: FlexColumnWidth(3), // Emisor
+                                  0: FlexColumnWidth(3), // Beneficiario
                                   1: FlexColumnWidth(2), // Número
                                   2: FlexColumnWidth(2), // Fecha de factura
                                   3: FlexColumnWidth(2), // Importe
@@ -210,7 +210,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                                       TableCell(
                                           child: Padding(
                                               padding: EdgeInsets.all(8.0),
-                                              child: Text('Emisor', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                              child: Text('Beneficiario', style: TextStyle(fontWeight: FontWeight.bold)))),
                                       TableCell(
                                           child: Padding(
                                               padding: EdgeInsets.all(8.0),
@@ -259,7 +259,7 @@ class PaidExpensesScreen extends GetView<PaidExpensesController> {
                                           TableCell(
                                             child: Padding(
                                               padding: const EdgeInsets.all(8.0),
-                                              child: Text(data['issuer'] ?? ''),
+                                              child: Text(data['beneficiary'] ?? ''),
                                             ),
                                           ),
                                           TableCell(
